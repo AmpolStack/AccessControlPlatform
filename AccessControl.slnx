@@ -1,3 +1,12 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+  </Folder>
+  <Folder Name="/Solution Items/Database/">
+    <File Path="database/all-in-one-query.sql" />
+    <File Path="database/procedures-query.sql" />
+    <File Path="database/tables-query.sql" />
+    <File Path="database/triggers-query.sql" />
+  </Folder>
   <Project Path="AccessControl/AccessControl.csproj" />
 </Solution>
