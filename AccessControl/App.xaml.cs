@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using AccessControl.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System.Configuration;
 using System.Data;
 using System.Windows;
@@ -14,6 +16,11 @@ namespace AccessControl
             var services = new ServiceCollection();
 
             services.AddSingleton<MainWindow>();
+
+            services.AddDbContext<AccessControlContext>(opt =>
+            {
+                opt.UseSqlServer("Server=Me1097;Database=AccessControl;Trusted_Connection=true;TrustServerCertificate=true;");
+            });
 
             Services = services.BuildServiceProvider();
 
