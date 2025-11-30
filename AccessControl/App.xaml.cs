@@ -1,4 +1,4 @@
-﻿using AccessControl.Models;
+﻿using AccessControl.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Configuration;

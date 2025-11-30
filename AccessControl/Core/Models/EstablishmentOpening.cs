@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace AccessControl.Models;
+﻿namespace AccessControl.Core.Models;
 
 public partial class EstablishmentOpening
 {

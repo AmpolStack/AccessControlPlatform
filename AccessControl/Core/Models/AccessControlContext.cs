@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace AccessControl.Models;
+namespace AccessControl.Core.Models;
 
 public partial class AccessControlContext : DbContext
 {
