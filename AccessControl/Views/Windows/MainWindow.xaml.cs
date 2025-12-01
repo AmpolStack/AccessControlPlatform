@@ -20,5 +20,10 @@ namespace AccessControl
         {
             InitializeComponent();
         }
+
+        private void emailTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
     }
 }
