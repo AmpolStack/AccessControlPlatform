@@ -8,8 +8,8 @@ namespace AccessControl.Views.Controls
     {
 
         public static readonly DependencyProperty ButtonTypeProperty =
-         DependencyProperty.Register("ButtonType", typeof(ButtonType), typeof(StandardButtonControl),
-             new PropertyMetadata(ButtonType.Sober));
+         DependencyProperty.Register("ButtonType", typeof(AppElementType), typeof(StandardButtonControl),
+             new PropertyMetadata(AppElementType.Sober));
 
         public static readonly DependencyProperty ButtonContentProperty =
          DependencyProperty.Register("ButtonContent", typeof(string), typeof(StandardButtonControl),
@@ -20,9 +20,9 @@ namespace AccessControl.Views.Controls
             InitializeComponent();
         }
 
-        public ButtonType ButtonType
+        public AppElementType ButtonType
         {
-            get { return (ButtonType)GetValue(ButtonTypeProperty); }
+            get { return (AppElementType)GetValue(ButtonTypeProperty); }
             set { SetValue(ButtonTypeProperty, value); }
         }
 
