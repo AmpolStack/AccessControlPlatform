@@ -34,8 +34,8 @@
 
 
     <Border CornerRadius="5"
-            Background="{Binding ButtonType, ElementName=ucStandardButton, Converter={StaticResource ButtonTypeToBrushConverter}}"
-            BorderBrush="{Binding ButtonType, ElementName=ucStandardButton, Converter={StaticResource ButtonTypeToBrushConverter}}"
+            Background="{Binding ButtonType, ElementName=ucStandardButton, Converter={StaticResource AppElementTypeToBrushConverter}}"
+            BorderBrush="{Binding ButtonType, ElementName=ucStandardButton, Converter={StaticResource AppElementTypeToBrushConverter}}"
             HorizontalAlignment="Center"
             MaxHeight="40"
             Cursor="Hand">

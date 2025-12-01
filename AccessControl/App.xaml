@@ -8,8 +8,8 @@
         
         <ResourceDictionary>
 
-            <converter:ButtonTypeToBrushConverter x:Key="ButtonTypeToBrushConverter"/>
-            <converter:ButtonTypeToColorConverter x:Key="ButtonTypeToColorConverter"/>
+            <converter:ButtonTypeToBrushConverter x:Key="AppElementTypeToBrushConverter"/>
+            <converter:ButtonTypeToColorConverter x:Key="AppElementypeToColorConverter"/>
             <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
 
 

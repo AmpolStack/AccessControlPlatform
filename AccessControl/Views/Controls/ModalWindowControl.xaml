@@ -13,7 +13,7 @@
             Padding="15"
             Panel.ZIndex="9999"
             Visibility="{Binding ModalWindowVisibility, ElementName=ucModalWindow, Converter={StaticResource BoolToVisibilityConverter}}"
-            Background="{Binding ModalWindowType, ElementName=ucModalWindow, Converter={StaticResource ButtonTypeToBrushConverter}}">
+            Background="{Binding ModalWindowType, ElementName=ucModalWindow, Converter={StaticResource AppElementTypeToBrushConverter}}">
 
         <Grid>
             <Grid.ColumnDefinitions>
