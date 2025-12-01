@@ -1,0 +1,13 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+   
+    <FontFamily x:Key="InterFont">./Resources/Assets/Fonts/Inter/inter-font.ttf#Inter</FontFamily>
+
+    <FontWeight x:Key="InterThinWeight">Thin</FontWeight>
+    <FontWeight x:Key="InterLightWeight">Light</FontWeight>
+    <FontWeight x:Key="InterNormalWeight">Normal</FontWeight>
+    <FontWeight x:Key="InterMediumWeight">Medium</FontWeight>
+    <FontWeight x:Key="InterSemiBoldWeight">SemiBold</FontWeight>
+    <FontWeight x:Key="InterBoldWeight">Bold</FontWeight>
+    
+</ResourceDictionary>
