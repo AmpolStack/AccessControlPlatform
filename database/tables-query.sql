@@ -43,7 +43,6 @@ CREATE TABLE AccessRecords (
     
     FOREIGN KEY (UserId) REFERENCES Users(Id),
     FOREIGN KEY (EstablishmentId) REFERENCES Establishments(Id),
-    FOREIGN KEY (RegisteredByUserId) REFERENCES Users(Id)
 );
 
 CREATE TABLE EstablishmentOpenings (

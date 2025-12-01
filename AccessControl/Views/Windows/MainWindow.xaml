@@ -12,72 +12,68 @@
         FontFamily="{StaticResource InterFont}"
         FontWeight="{StaticResource InterNormalWeight}"
         Foreground="{StaticResource AppBlackBrush}"
-        Title="MainWindow" Height="500" Width="900">
+        Title="MainWindow" Height="680" Width="905">
 
-    <Border Background="{StaticResource AppWhiteBrush}" CornerRadius="18" Padding="10">
+    <Border Background="{StaticResource AppWhiteBrush}" CornerRadius="18" Padding="30,30,30, 20">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" MaxWidth="200"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="*" MaxWidth="200"/>
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="*" MaxHeight="90"/>
+                <RowDefinition Height="*" MaxHeight="100"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*" MaxHeight="40"/>
             </Grid.RowDefinitions>
 
 
-            <TextBlock Grid.Column="0"
-                       Grid.Row="0"
-                       FontWeight="{StaticResource InterBoldWeight}"
-                       FontSize="32"
-                       Text="CONTROL&#10;DE&#10;INGRESO"
-                       VerticalAlignment="Center"
-                       LineHeight="24"
-                       LineStackingStrategy="BlockLineHeight"
-                       TextAlignment="Left"
-                       HorizontalAlignment="Center">
-            </TextBlock>
+            <controls:HeaderControl Grid.Column="0"
+                                Grid.ColumnSpan="3"
+                                Grid.Row="0"
+                                UserName="Heyther&#10;Santiago"/>
+
 
             <TextBlock Grid.Column="0"
                        Grid.Row="2"
                        Grid.ColumnSpan="3"
                        TextAlignment="Left"
-                   
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center">
-                ¿Está usted interesado en crear su propio establecimiento?
+                       ¿Está usted interesado en crear su propio establecimiento?
                 <Hyperlink Foreground="{StaticResource AppBlueBrush}" 
-                           TextDecorations="Underline"
-                           >
-                Ingrese Aquí
+                           TextDecorations="Underline">
+                        Ingrese Aquí
                 </Hyperlink>
             </TextBlock>
 
 
-
-
             <Grid Grid.Column="1"
-      Grid.Row="1">
+                  Grid.Row="1" 
+                  VerticalAlignment="Center">
+                
                 <Grid.RowDefinitions>
                     <RowDefinition Height="2*" MaxHeight="120"/>
                     <RowDefinition Height="*" MaxHeight="72" />
                     <RowDefinition Height="*"  MaxHeight="72"/>
-                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
                 <Grid HorizontalAlignment="Center">
+                    
                     <Ellipse Fill="{StaticResource AppBlackBrush}"/>
 
                     <Border CornerRadius="100"
                             ClipToBounds="True"
                             Margin="15">
+                        
                         <Image Source="/Resources/Assets/Images/user-white-icon.png"
                                Stretch="Uniform"
                                RenderOptions.BitmapScalingMode="HighQuality"/>
+                        
                     </Border>
+                    
                 </Grid>
 
                 <controls:FormFieldControl Grid.Row="1"
@@ -89,14 +85,23 @@
 
                 <controls:StandardButtonControl Grid.Row="3"
                                                 ButtonContent="Ingresar"
-                                                ButtonType="Sober"/>
-
+                                                ButtonType="Sober"
+                                                Margin="0,20,0,0"/>
+                
             </Grid>
+                        
+            <controls:ModalWindowControl 
+                      Grid.Column="1"
+                      Grid.Row="0"
+                      Grid.ColumnSpan="2"
+                      Grid.RowSpan="2"
+                      ModalWindowType="Danger"
+                      ModalWindowText="El usuario no fué encontrado, intentalo de nuevo"
+                      ModalWindowVisibility="True"/>
 
         </Grid>
 
+
     </Border>
-
-
 
 </Window>

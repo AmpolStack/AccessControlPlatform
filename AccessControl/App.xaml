@@ -10,6 +10,8 @@
 
             <converter:ButtonTypeToBrushConverter x:Key="ButtonTypeToBrushConverter"/>
             <converter:ButtonTypeToColorConverter x:Key="ButtonTypeToColorConverter"/>
+            <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+
 
 
             <ResourceDictionary.MergedDictionaries>
