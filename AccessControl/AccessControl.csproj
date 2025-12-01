@@ -18,6 +18,11 @@
   </ItemGroup>
 
   <ItemGroup>
+	  <Resource Include="Resources\Assets\Fonts\Inter\inter-font.ttf" />
+	  <Resource Include="Resources\Assets\Images\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Core\Interfaces\Repositories\" />
     <Folder Include="Core\Interfaces\Services\" />
     <Folder Include="Core\ViewModels\" />
