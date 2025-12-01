@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AccessControl.Views.Enums
 {
-    public enum ButtonType
+    public enum AppElementType
     {
         Sober,
         Vibrant,

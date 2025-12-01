@@ -15,14 +15,14 @@ namespace AccessControl.Views.Converter
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is ButtonType buttonType)
+            if (value is AppElementType buttonType)
             {
                 return buttonType switch
                 {
-                    ButtonType.Sober => GetBrush("AppBlackBrush"),
-                    ButtonType.Vibrant => GetBrush("AppBlueBrush"),
-                    ButtonType.Success => GetBrush("AppGreenBrush"),
-                    ButtonType.Danger => GetBrush("AppRedBrush"),
+                    AppElementType.Sober => GetBrush("AppBlackBrush"),
+                    AppElementType.Vibrant => GetBrush("AppBlueBrush"),
+                    AppElementType.Success => GetBrush("AppGreenBrush"),
+                    AppElementType.Danger => GetBrush("AppRedBrush"),
 
                     _ => GetBrush("AppBlackBrush")
                 };

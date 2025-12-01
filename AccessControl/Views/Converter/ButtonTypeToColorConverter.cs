@@ -11,14 +11,14 @@ namespace AccessControl.Views.Converter
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
 
-            if (value is ButtonType buttonType)
+            if (value is AppElementType buttonType)
             {
                 return buttonType switch
                 {
-                    ButtonType.Sober => GetColor("AppBlackColor"),
-                    ButtonType.Vibrant => GetColor("AppBlueColor"),
-                    ButtonType.Success => GetColor("AppGreenColor"),
-                    ButtonType.Danger => GetColor("AppRedColor"),
+                    AppElementType.Sober => GetColor("AppBlackColor"),
+                    AppElementType.Vibrant => GetColor("AppBlueColor"),
+                    AppElementType.Success => GetColor("AppGreenColor"),
+                    AppElementType.Danger => GetColor("AppRedColor"),
 
                     _ => GetColor("AppBlackColor")
                 };
