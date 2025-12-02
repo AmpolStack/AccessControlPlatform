@@ -8,12 +8,16 @@
              x:Name="ucModalWindow"
              d:DesignHeight="450" d:DesignWidth="800">
 
-    <Border CornerRadius="10"
+    <Border x:Name="MainBorder"
+            CornerRadius="10"
             VerticalAlignment="Top"
             Padding="15"
             Panel.ZIndex="9999"
-            Visibility="{Binding ModalWindowVisibility, ElementName=ucModalWindow, Converter={StaticResource BoolToVisibilityConverter}}"
             Background="{Binding ModalWindowType, ElementName=ucModalWindow, Converter={StaticResource AppElementTypeToBrushConverter}}">
+            
+        <Border.RenderTransform>
+            <TranslateTransform X="400"/>
+        </Border.RenderTransform>
 
         <Grid>
             <Grid.ColumnDefinitions>
@@ -35,7 +39,8 @@
                    Cursor="Hand"
                    Source="/Resources/Assets/Images/close-icon.png"
                    Stretch="Uniform"
-                   RenderOptions.BitmapScalingMode="HighQuality"/>
+                   RenderOptions.BitmapScalingMode="HighQuality"
+                   MouseLeftButtonDown="CloseModal_MouseLeftButtonDown"/>
 
         </Grid>
     </Border>
