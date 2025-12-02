@@ -1,6 +1,7 @@
 ﻿using AccessControl.Core.Interfaces.Common;
 using AccessControl.Core.Interfaces.Services;
 using AccessControl.Core.Models;
+using AccessControl.Core.ViewModels;
 using AccessControl.Infraestructure.Common;
 using AccessControl.Infraestructure.Services;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,9 @@ namespace AccessControl
             services.AddScoped<ITransactionParameterHelpers, TransactionParameterHelpers>();
 
             services.AddScoped<IUserService, UserService>();
+
+            services.AddScoped<LoginViewModel>();
+
 
             services.AddDbContext<AccessControlContext>(opt =>
             {

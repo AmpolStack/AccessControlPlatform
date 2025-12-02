@@ -22,8 +22,4 @@
 	  <Resource Include="Resources\Assets\Images\**" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Core\ViewModels\" />
-  </ItemGroup>
-
 </Project>

@@ -1,4 +1,5 @@
-﻿using AccessControl.Core.Interfaces.Services;
+﻿using AccessControl.Core.Interfaces.Common;
+using AccessControl.Core.Interfaces.Services;
 using AccessControl.Core.Models;
 using AccessControl.Infraestructure.Dto;
 using Microsoft.Data.SqlClient;
@@ -7,9 +8,10 @@ using System.Data;
 
 namespace AccessControl.Infraestructure.Services
 {
-    public class UserService(AccessControlContext context) : IUserService
+    public class UserService(AccessControlContext context, ITransactionParameterHelpers helpers) : IUserService
     {
         private readonly AccessControlContext _context = context;
+        private readonly ITransactionParameterHelpers _helpers = helpers;
 
         // Logic embedded in sp
         public async Task<(bool Success, string Message, User? User)> LoginAsync(string email, string password)
@@ -18,8 +20,8 @@ namespace AccessControl.Infraestructure.Services
 
             try
             {
-                var pEmail = new SqlParameter("@Email", email);
-                var pPassword = new SqlParameter("@Password", password);
+                var pEmail = _helpers.CreateInput("@Email", email);
+                var pPassword = _helpers.CreateInput("@Password", password);
 
                 var result = await _context.LoginResultDto
                     .FromSqlRaw("EXEC sp_UserLogin @Email, @Password", pEmail, pPassword)
@@ -38,12 +40,11 @@ namespace AccessControl.Infraestructure.Services
                     return (false, dto.Message!, null);
                 }
 
-                // TODO: Map DTO to User entity with Automapper
                 var user = new User
                 {
                     Id = dto.Id,
                     Email = dto.Email!,
-                    FullName = dto!.FullName!,
+                    FullName = dto.FullName!,
                     IdentityDocument = dto.IdentityDocument!,
                     PhoneNumber = dto.PhoneNumber,
                     Role = dto.Role!,
@@ -69,41 +70,34 @@ namespace AccessControl.Infraestructure.Services
 
             try
             {
-                var pResult = new SqlParameter("@Result", SqlDbType.Bit)
-                {
-                    Direction = ParameterDirection.Output
-                };
-
-                var pMessage = new SqlParameter("@Message", SqlDbType.NVarChar, 200)
-                {
-                    Direction = ParameterDirection.Output
-                };
+                var pResult = _helpers.CreateOutput("@Result", SqlDbType.Bit);
+                var pMessage = _helpers.CreateOutput("@Message", SqlDbType.NVarChar, 200);
 
                 await _context.Database.ExecuteSqlRawAsync(
                     @"EXEC sp_CreateUser 
-                    @Email,
-                    @Password,
-                    @FullName,
-                    @IdentityDocument,
-                    @PhoneNumber,
-                    @EstablishmentId,
-                    @Role,
-                    @CreatedBy,
-                    @Result OUTPUT,
-                    @Message OUTPUT",
-                    new SqlParameter("@Email", user.Email),
-                    new SqlParameter("@Password", user.Password),
-                    new SqlParameter("@FullName", user.FullName),
-                    new SqlParameter("@IdentityDocument", user.IdentityDocument),
-                    new SqlParameter("@PhoneNumber", (object?)user.PhoneNumber ?? DBNull.Value),
-                    new SqlParameter("@EstablishmentId", user.EstablishmentId),
-                    new SqlParameter("@Role", user.Role),
-                    new SqlParameter("@CreatedBy", 0),
+                        @Email,
+                        @Password,
+                        @FullName,
+                        @IdentityDocument,
+                        @PhoneNumber,
+                        @EstablishmentId,
+                        @Role,
+                        @CreatedBy,
+                        @Result OUTPUT,
+                        @Message OUTPUT",
+                    _helpers.CreateInput("@Email", user.Email),
+                    _helpers.CreateInput("@Password", user.Password),
+                    _helpers.CreateInput("@FullName", user.FullName),
+                    _helpers.CreateInput("@IdentityDocument", user.IdentityDocument),
+                    _helpers.CreateNullable("@PhoneNumber", user.PhoneNumber),
+                    _helpers.CreateInput("@EstablishmentId", user.EstablishmentId),
+                    _helpers.CreateInput("@Role", user.Role),
+                    _helpers.CreateInput("@CreatedBy", 0),
                     pResult,
                     pMessage
                 );
 
-                var result = new CreateUserResultDto()
+                var result = new CreateUserResultDto
                 {
                     Success = (bool)pResult.Value,
                     Message = (string)pMessage.Value
@@ -160,7 +154,6 @@ namespace AccessControl.Infraestructure.Services
             }
         }
 
-
         // Implements logic directly, no stored procedure
         public async Task<(bool Success, string Message)> DeleteUserAsync(int id)
         {
@@ -198,4 +191,5 @@ namespace AccessControl.Infraestructure.Services
         }
 
     }
+
 }
