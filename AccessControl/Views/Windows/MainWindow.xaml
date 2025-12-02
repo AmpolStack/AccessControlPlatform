@@ -30,11 +30,12 @@
                 <RowDefinition Height="*" MaxHeight="40"/>
             </Grid.RowDefinitions>
 
+      
 
-            <controls:HeaderControl Grid.Column="0"
+                <controls:HeaderControl Grid.Column="0"
                                 Grid.ColumnSpan="3"
                                 Grid.Row="0"
-                                UserName="Heyther&#10;Santiago"/>
+                                UserName="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
 
 
             <TextBlock Grid.Column="0"
@@ -79,10 +80,12 @@
                 </Grid>
 
                 <controls:FormFieldControl Grid.Row="1"
-                                           LabelText="_Email"/>
+                                           LabelText="_Email"
+                                           Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"/>
 
                 <controls:FormFieldControl Grid.Row="2"
-                           LabelText="_Contraseña"/>
+                           LabelText="_Contraseña"
+                           Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}"/>
 
 
                 <controls:StandardButtonControl Grid.Row="3"
