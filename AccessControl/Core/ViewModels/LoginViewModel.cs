@@ -8,8 +8,8 @@ namespace AccessControl.Core.ViewModels
         private string _modalType = "Danger";
         private string _modalText = string.Empty;
         private bool _isModalVisible;
-        private string _email = string.Empty;
-        private string _password = string.Empty;
+        private string _email = "empleado1@gimnasio.com";
+        private string _password = "$2a$10$1234512345123451234512";
         private readonly IUserService _userService;
         public RelayCommand LoginCommand { get; }
 
@@ -82,7 +82,7 @@ namespace AccessControl.Core.ViewModels
                 }
 
                 ModalType = "Success";
-                ModalText = $"Bienvenido, {User!.FullName}";
+                ModalText = Message;
                 IsModalVisible = true;
 
                 // Aquí navegarías al home

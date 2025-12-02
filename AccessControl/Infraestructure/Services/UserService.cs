@@ -2,7 +2,6 @@
 using AccessControl.Core.Interfaces.Services;
 using AccessControl.Core.Models;
 using AccessControl.Infraestructure.Dto;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 
@@ -22,39 +21,47 @@ namespace AccessControl.Infraestructure.Services
             {
                 var pEmail = _helpers.CreateInput("@Email", email);
                 var pPassword = _helpers.CreateInput("@Password", password);
+                var pSuccess = _helpers.CreateOutput("@Success", SqlDbType.Bit);
+                var pMessage = _helpers.CreateOutput("@Message", SqlDbType.NVarChar, 200);
 
-                var result = await _context.LoginResultDto
-                    .FromSqlRaw("EXEC sp_UserLogin @Email, @Password", pEmail, pPassword)
+                var result = await _context.UserLoginDataDto
+                    .FromSqlRaw(@"EXEC sp_UserLogin @Email, @Password, @Success OUTPUT, @Message OUTPUT", 
+                        pEmail, pPassword, pSuccess, pMessage)
+                    .AsNoTracking()
                     .ToListAsync();
+
+                var success = (bool)pSuccess.Value;
+                var message = (string)pMessage.Value;
+
+                if (!success)
+                {
+                    await transaction.RollbackAsync();
+                    return (false, message, null);
+                }
 
                 var dto = result.FirstOrDefault();
                 if (dto == null)
                 {
                     await transaction.RollbackAsync();
-                    return (false, "Invalid response", null);
+                    return (false, "No user data returned", null);
                 }
 
-                if (!dto.Success)
-                {
-                    await transaction.RollbackAsync();
-                    return (false, dto.Message!, null);
-                }
-
+                // TODO: Mapping can be improved with AutoMapper or similar
                 var user = new User
                 {
                     Id = dto.Id,
-                    Email = dto.Email!,
-                    FullName = dto.FullName!,
-                    IdentityDocument = dto.IdentityDocument!,
+                    Email = dto.Email,
+                    FullName = dto.FullName,
+                    IdentityDocument = dto.IdentityDocument,
                     PhoneNumber = dto.PhoneNumber,
-                    Role = dto.Role!,
+                    Role = dto.Role,
                     EstablishmentId = dto.EstablishmentId,
                     IsActive = dto.IsActive,
                     MustChangePassword = dto.MustChangePassword
                 };
 
                 await transaction.CommitAsync();
-                return (true, dto.Message!, user);
+                return (true, message, user);
             }
             catch (Exception ex)
             {

@@ -14,9 +14,9 @@ public partial class AccessControlContext : DbContext
     {
     }
 
-    public DbSet<LoginResultDto> LoginResultDto { get; set; }
+    public DbSet<UserLoginDataDto> UserLoginDataDto { get; set; }
 
-    public DbSet<CreateUserResultDto> createUserResultDto { get; set; }
+    public DbSet<CreateUserResultDto> CreateUserResultDto { get; set; }
     public virtual DbSet<AccessRecord> AccessRecords { get; set; }
 
     public virtual DbSet<Establishment> Establishments { get; set; }
@@ -29,8 +29,24 @@ public partial class AccessControlContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<UserLoginDataDto>(entity =>
+        {
+            entity.HasNoKey();
+            entity.Property(e => e.Id);
+            entity.Property(e => e.Email);
+            entity.Property(e => e.FullName);
+            entity.Property(e => e.EstablishmentId);
+            entity.Property(e => e.Role);
+            entity.Property(e => e.IsActive);
+            entity.Property(e => e.IdentityDocument);
+            entity.Property(e => e.PhoneNumber);
+            entity.Property(e => e.MustChangePassword);
+            entity.Property(e => e.CreatedDate);
+            entity.Property(e => e.LastLoginDate);
+            entity.Property(e => e.EstablishmentName);
+            entity.Property(e => e.MaxCapacity);
+        });
 
-        modelBuilder.Entity<LoginResultDto>().HasNoKey();
         modelBuilder.Entity<CreateUserResultDto>().HasNoKey();
 
         modelBuilder.Entity<AccessRecord>(entity =>
