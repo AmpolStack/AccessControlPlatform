@@ -1,9 +1,5 @@
 namespace AccessControl.Infraestructure.Dto
 {
-    /// <summary>
-    /// DTO for User Login data returned by sp_UserLogin
-    /// Success and Message are now handled via OUTPUT parameters
-    /// </summary>
     public class UserLoginDataDto
     {
         public int Id { get; set; }
@@ -17,8 +13,6 @@ namespace AccessControl.Infraestructure.Dto
         public bool MustChangePassword { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? LastLoginDate { get; set; }
-        
-        // Establishment data
         public string EstablishmentName { get; set; } = string.Empty;
         public int? MaxCapacity { get; set; }
     }
