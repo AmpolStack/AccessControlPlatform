@@ -1,3 +1,73 @@
+CREATE PROCEDURE sp_UserLogin
+    @Email NVARCHAR(100),
+    @Password NVARCHAR(100),
+    @Success BIT OUTPUT,
+    @Message NVARCHAR(200) OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    DECLARE @UserId INT;
+    DECLARE @StoredHash NVARCHAR(255);
+    DECLARE @IsActive BIT;
+    DECLARE @EstablishmentId INT;
+    
+    SELECT 
+        @UserId = Id,
+        @StoredHash = Password,
+        @IsActive = IsActive,
+        @EstablishmentId = EstablishmentId
+    FROM Users 
+    WHERE Email = @Email;
+    
+    IF @UserId IS NULL
+    BEGIN
+        SET @Success = 0;
+        SET @Message = 'User not found';
+        RETURN;
+    END
+    
+    IF @IsActive = 0
+    BEGIN
+        SET @Success = 0;
+        SET @Message = 'User inactive';
+        RETURN;
+    END
+    
+    IF @StoredHash IS NULL
+    BEGIN
+        SET @Success = 0;
+        SET @Message = 'Invalid credentials';
+        RETURN;
+    END
+
+    UPDATE Users 
+    SET LastLoginDate = GETDATE() 
+    WHERE Id = @UserId;
+    
+    SET @Success = 1;
+    SET @Message = 'Login successful';
+    
+    SELECT 
+        U.Id,
+        U.Email,
+        U.FullName,
+        U.EstablishmentId,
+        U.Role,
+        U.IsActive,
+        U.IdentityDocument,
+        U.PhoneNumber,
+        U.MustChangePassword,
+        U.CreatedDate,
+        U.LastLoginDate,
+        E.Name AS EstablishmentName,
+        E.MaxCapacity
+    FROM Users U
+    INNER JOIN Establishments E ON U.EstablishmentId = E.Id
+    WHERE U.Id = @UserId;
+END
+GO
+
 -- SP for User Login
 CREATE PROCEDURE sp_UserLogin
     @Email NVARCHAR(100),
@@ -22,24 +92,45 @@ BEGIN
     IF @UserId IS NULL
     BEGIN
         SELECT 
-            NULL AS UserData,
-            NULL AS Establishment,
+            NULL AS Id,
+            NULL AS Email,
+            NULL AS FullName,
+            NULL AS EstablishmentId,
+            NULL AS Role,
+            CAST(0 AS BIT) AS IsActive,
+            NULL AS IdentityDocument,
+            NULL AS PhoneNumber,
+            CAST(0 AS BIT) AS MustChangePassword,
+            NULL AS CreatedDate,
+            NULL AS LastLoginDate,
+            NULL AS EstablishmentName,
+            NULL AS MaxCapacity,
             'User not found' AS Message,
-            0 AS Success;
+            CAST(0 AS BIT) AS Success;
         RETURN;
     END
     
     IF @IsActive = 0
     BEGIN
         SELECT 
-            NULL AS UserData,
-            NULL AS Establishment,
+            NULL AS Id,
+            NULL AS Email,
+            NULL AS FullName,
+            NULL AS EstablishmentId,
+            NULL AS Role,
+            CAST(0 AS BIT) AS IsActive,
+            NULL AS IdentityDocument,
+            NULL AS PhoneNumber,
+            CAST(0 AS BIT) AS MustChangePassword,
+            NULL AS CreatedDate,
+            NULL AS LastLoginDate,
+            NULL AS EstablishmentName,
+            NULL AS MaxCapacity,
             'User inactive' AS Message,
-            0 AS Success;
+            CAST(0 AS BIT) AS Success;
         RETURN;
     END
     
-    -- Password verification will be done in code with BCrypt
     IF @StoredHash IS NOT NULL
     BEGIN
         -- Update last login
@@ -51,16 +142,16 @@ BEGIN
             U.FullName,
             U.EstablishmentId,
             U.Role,
-            U.IsActive,
+            CAST(U.IsActive AS BIT) AS IsActive,
             U.IdentityDocument,
             U.PhoneNumber,
-            U.MustChangePassword,
+            CAST(U.MustChangePassword AS BIT) AS MustChangePassword,
             U.CreatedDate,
             U.LastLoginDate,
             E.Name AS EstablishmentName,
             E.MaxCapacity,
             'Login successful' AS Message,
-            1 AS Success
+            CAST(1 AS BIT) AS Success
         FROM Users U
         INNER JOIN Establishments E ON U.EstablishmentId = E.Id
         WHERE U.Id = @UserId;
@@ -68,10 +159,21 @@ BEGIN
     ELSE
     BEGIN
         SELECT 
-            NULL AS UserData,
-            NULL AS Establishment,
+            NULL AS Id,
+            NULL AS Email,
+            NULL AS FullName,
+            NULL AS EstablishmentId,
+            NULL AS Role,
+            CAST(0 AS BIT) AS IsActive,
+            NULL AS IdentityDocument,
+            NULL AS PhoneNumber,
+            CAST(0 AS BIT) AS MustChangePassword,
+            NULL AS CreatedDate,
+            NULL AS LastLoginDate,
+            NULL AS EstablishmentName,
+            NULL AS MaxCapacity,
             'Invalid credentials' AS Message,
-            0 AS Success;
+            CAST(0 AS BIT) AS Success;
     END
 END
 GO
