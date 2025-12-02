@@ -5,28 +5,26 @@ namespace AccessControl.Core.ViewModels
 {
     public class LoginViewModel : ObservableObject
     {
+        private readonly IUserService _userService;
+        
         private string _modalType = "Danger";
         private string _modalText = string.Empty;
         private bool _isModalVisible;
         private string _email = "empleado1@gimnasio.com";
         private string _password = "$2a$10$1234512345123451234512";
-        private readonly IUserService _userService;
-        public RelayCommand LoginCommand { get; }
+        private string _name;
+        private bool _isLoading;
+
+        public AsyncRelayCommand LoginCommand { get; }
 
         public LoginViewModel(IUserService userService)
         {
             _userService = userService;
 
-            LoginCommand = new RelayCommand(
-                execute: _ => Login(),
+            LoginCommand = new AsyncRelayCommand(
+                execute: async _ => await LoginAsync(),
                 canExecute: _ => CanLogin()
             );
-        }
-
-        public string ModalType
-        {
-            get => _modalType;
-            set => SetProperty(ref _modalType, value);
         }
 
         public string Email
@@ -35,6 +33,16 @@ namespace AccessControl.Core.ViewModels
             set
             {
                 if (SetProperty(ref _email, value))
+                    LoginCommand.RaiseCanExecuteChanged();
+            }
+        }
+
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (SetProperty(ref _name, value))
                     LoginCommand.RaiseCanExecuteChanged();
             }
         }
@@ -55,10 +63,10 @@ namespace AccessControl.Core.ViewModels
             set => SetProperty(ref _isModalVisible, value);
         }
 
-        private bool CanLogin()
+        public string ModalType
         {
-            return !string.IsNullOrWhiteSpace(Email)
-                && !string.IsNullOrWhiteSpace(Password);
+            get => _modalType;
+            set => SetProperty(ref _modalType, value);
         }
 
         public string ModalText
@@ -67,32 +75,56 @@ namespace AccessControl.Core.ViewModels
             set => SetProperty(ref _modalText, value);
         }
 
-        private async void Login()
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set => SetProperty(ref _isLoading, value);
+        }
+
+        private bool CanLogin()
+        {
+            return !string.IsNullOrWhiteSpace(Email) 
+                && !string.IsNullOrWhiteSpace(Password)
+                && !IsLoading;
+        }
+
+        private async Task LoginAsync()
         {
             try
             {
+                IsLoading = true;
+                LoginCommand.RaiseCanExecuteChanged();
+
                 var (Success, Message, User) = await _userService.LoginAsync(Email, Password);
 
-                if (!Success)
+                if (!Success || User==null)
                 {
-                    ModalType = "Danger";
-                    ModalText = Message;
-                    IsModalVisible = true;
+                    ShowModal("Danger", Message);
                     return;
                 }
 
-                ModalType = "Success";
-                ModalText = Message;
-                IsModalVisible = true;
-
-                // Aquí navegarías al home
+                Name = User.FullName;
+                ShowModal("Success", Message);
+                
+                // TODO: Implementar navegación
+                // NavigationService.NavigateTo(typeof(HomeViewModel));
             }
             catch (Exception ex)
             {
-                ModalType = "Danger";
-                ModalText = $"Error inesperado: {ex.Message}";
-                IsModalVisible = true;
+                ShowModal("Danger", $"Error inesperado: {ex.Message}");
             }
+            finally
+            {
+                IsLoading = false;
+                LoginCommand.RaiseCanExecuteChanged();
+            }
+        }
+
+        private void ShowModal(string type, string text)
+        {
+            ModalType = type;
+            ModalText = text;
+            IsModalVisible = true;
         }
     }
 }
