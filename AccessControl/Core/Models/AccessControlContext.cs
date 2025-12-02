@@ -15,6 +15,9 @@ public partial class AccessControlContext : DbContext
     }
 
     public DbSet<UserLoginDataDto> UserLoginDataDto { get; set; }
+    public DbSet<CurrentCapacityDto> CurrentCapacityDto { get; set; }
+    public DbSet<UserAccessHistoryDto> UserAccessHistoryDto { get; set; }
+    public DbSet<HourlyAverageDto> HourlyAverageDto { get; set; }
 
     public DbSet<CreateUserResultDto> CreateUserResultDto { get; set; }
     public virtual DbSet<AccessRecord> AccessRecords { get; set; }
@@ -48,6 +51,10 @@ public partial class AccessControlContext : DbContext
         });
 
         modelBuilder.Entity<CreateUserResultDto>().HasNoKey();
+
+        modelBuilder.Entity<CurrentCapacityDto>().HasNoKey();
+        modelBuilder.Entity<UserAccessHistoryDto>().HasNoKey();
+        modelBuilder.Entity<HourlyAverageDto>().HasNoKey();
 
         modelBuilder.Entity<AccessRecord>(entity =>
         {
