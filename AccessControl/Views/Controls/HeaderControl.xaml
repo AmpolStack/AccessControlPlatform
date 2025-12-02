@@ -31,10 +31,11 @@
 
         <TextBlock Grid.Column="2"
                   Grid.Row="0"
+                  TextWrapping="Wrap"
                   FontWeight="{StaticResource InterSemiBoldWeight}"
                   Foreground="{StaticResource AppBlueBrush}"
                   FontSize="30"
-                  Text="{Binding UserName, ElementName=ucHeader}"
+                  Text="{Binding TruncatedUserName, ElementName=ucHeader}"
                   LineHeight="24"
                   LineStackingStrategy="BlockLineHeight"
                   TextAlignment="Right">
