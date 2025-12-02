@@ -63,6 +63,7 @@
 
         <Button Content="{Binding ButtonContent, ElementName=ucStandardButton}"
         FontSize="14"
+        Command="{Binding Command, ElementName=ucStandardButton}"
         Background="Transparent"
         Foreground="{StaticResource AppWhiteBrush}"
         FontWeight="{StaticResource InterSemiBoldWeight}"

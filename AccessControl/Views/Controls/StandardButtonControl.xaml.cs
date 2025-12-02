@@ -1,11 +1,15 @@
 ﻿using AccessControl.Views.Enums;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace AccessControl.Views.Controls
 {
     public partial class StandardButtonControl : UserControl
     {
+        public static readonly DependencyProperty CommandProperty =
+            DependencyProperty.Register("Command", typeof(ICommand), typeof(StandardButtonControl),
+                new PropertyMetadata(null));
 
         public static readonly DependencyProperty ButtonTypeProperty =
          DependencyProperty.Register("ButtonType", typeof(AppElementType), typeof(StandardButtonControl),
@@ -30,6 +34,12 @@ namespace AccessControl.Views.Controls
         {
             get { return (string)GetValue(ButtonContentProperty); }
             set { SetValue(ButtonContentProperty, value); }
+        }
+
+        public ICommand? Command
+        {
+            get => (ICommand?)GetValue(CommandProperty);
+            set => SetValue(CommandProperty, value);
         }
     }
 }
