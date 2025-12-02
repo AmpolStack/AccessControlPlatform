@@ -1,5 +1,7 @@
-﻿using AccessControl.Core.Interfaces.Services;
+﻿using AccessControl.Core.Interfaces.Common;
+using AccessControl.Core.Interfaces.Services;
 using AccessControl.Core.Models;
+using AccessControl.Infraestructure.Common;
 using AccessControl.Infraestructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +18,9 @@ namespace AccessControl
             var services = new ServiceCollection();
 
             services.AddSingleton<MainWindow>();
+
+            services.AddScoped<IUnitOrWork, UnitOfWork>();
+            services.AddScoped<ITransactionParameterHelpers, TransactionParameterHelpers>();
 
             services.AddScoped<IUserService, UserService>();
 
