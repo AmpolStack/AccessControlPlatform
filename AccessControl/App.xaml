@@ -2,25 +2,28 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:AccessControl"
-             xmlns:converter="clr-namespace:AccessControl.Views.Converter">
+             xmlns:converter="clr-namespace:AccessControl.Views.Converter"
+             xmlns:locator="clr-namespace:AccessControl.Infraestructure.Common">
              
     <Application.Resources>
-        
+
         <ResourceDictionary>
+
+            <locator:ViewModelLocator x:Key="ViewModelLocator"/>
 
             <converter:ButtonTypeToBrushConverter x:Key="AppElementTypeToBrushConverter"/>
             <converter:ButtonTypeToColorConverter x:Key="AppElementypeToColorConverter"/>
             <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
 
-
-
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Styles/FontsResource.xaml"/>
                 <ResourceDictionary Source="/Resources/Styles/ColorResource.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            
         </ResourceDictionary>
               
     </Application.Resources>
-    
-    
+
+
+
 </Application>

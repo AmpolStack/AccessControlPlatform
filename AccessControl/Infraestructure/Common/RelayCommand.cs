@@ -2,7 +2,7 @@
 
 namespace AccessControl.Infraestructure.Common
 {
-    public class RelayCommand
+    public class RelayCommand : ICommand
     {
         private readonly Action<object?> _execute;
         private readonly Predicate<object?>? _canExecute;
