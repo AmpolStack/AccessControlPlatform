@@ -18,27 +18,27 @@ BEGIN
         @IsActive = IsActive,
         @EstablishmentId = EstablishmentId
     FROM Users 
-    WHERE Email = @Email;
+    WHERE Email = @Email AND Password = @Password;
     
     IF @UserId IS NULL
     BEGIN
         SET @Success = 0;
         SET @Message = 'User not found';
-        RETURN;
+        GOTO FinalSelect;
     END
     
     IF @IsActive = 0
     BEGIN
         SET @Success = 0;
         SET @Message = 'User inactive';
-        RETURN;
+        GOTO FinalSelect;
     END
     
     IF @StoredHash IS NULL
     BEGIN
         SET @Success = 0;
         SET @Message = 'Invalid credentials';
-        RETURN;
+        GOTO FinalSelect;
     END
 
     UPDATE Users 
@@ -48,6 +48,7 @@ BEGIN
     SET @Success = 1;
     SET @Message = 'Login successful';
     
+FinalSelect:
     SELECT 
         U.Id,
         U.Email,
@@ -64,121 +65,11 @@ BEGIN
         E.MaxCapacity
     FROM Users U
     INNER JOIN Establishments E ON U.EstablishmentId = E.Id
-    WHERE U.Id = @UserId;
+    WHERE U.Id = @UserId AND @Success = 1;
 END
-GO
+GO 
 
--- SP for User Login
-CREATE PROCEDURE sp_UserLogin
-    @Email NVARCHAR(100),
-    @Password NVARCHAR(100)
-AS
-BEGIN
-    SET NOCOUNT ON;
-    
-    DECLARE @UserId INT;
-    DECLARE @StoredHash NVARCHAR(255);
-    DECLARE @IsActive BIT;
-    DECLARE @EstablishmentId INT;
-    
-    SELECT 
-        @UserId = Id,
-        @StoredHash = Password,
-        @IsActive = IsActive,
-        @EstablishmentId = EstablishmentId
-    FROM Users 
-    WHERE Email = @Email;
-    
-    IF @UserId IS NULL
-    BEGIN
-        SELECT 
-            NULL AS Id,
-            NULL AS Email,
-            NULL AS FullName,
-            NULL AS EstablishmentId,
-            NULL AS Role,
-            CAST(0 AS BIT) AS IsActive,
-            NULL AS IdentityDocument,
-            NULL AS PhoneNumber,
-            CAST(0 AS BIT) AS MustChangePassword,
-            NULL AS CreatedDate,
-            NULL AS LastLoginDate,
-            NULL AS EstablishmentName,
-            NULL AS MaxCapacity,
-            'User not found' AS Message,
-            CAST(0 AS BIT) AS Success;
-        RETURN;
-    END
-    
-    IF @IsActive = 0
-    BEGIN
-        SELECT 
-            NULL AS Id,
-            NULL AS Email,
-            NULL AS FullName,
-            NULL AS EstablishmentId,
-            NULL AS Role,
-            CAST(0 AS BIT) AS IsActive,
-            NULL AS IdentityDocument,
-            NULL AS PhoneNumber,
-            CAST(0 AS BIT) AS MustChangePassword,
-            NULL AS CreatedDate,
-            NULL AS LastLoginDate,
-            NULL AS EstablishmentName,
-            NULL AS MaxCapacity,
-            'User inactive' AS Message,
-            CAST(0 AS BIT) AS Success;
-        RETURN;
-    END
-    
-    IF @StoredHash IS NOT NULL
-    BEGIN
-        -- Update last login
-        UPDATE Users SET LastLoginDate = GETDATE() WHERE Id = @UserId;
-        
-        SELECT 
-            U.Id,
-            U.Email,
-            U.FullName,
-            U.EstablishmentId,
-            U.Role,
-            CAST(U.IsActive AS BIT) AS IsActive,
-            U.IdentityDocument,
-            U.PhoneNumber,
-            CAST(U.MustChangePassword AS BIT) AS MustChangePassword,
-            U.CreatedDate,
-            U.LastLoginDate,
-            E.Name AS EstablishmentName,
-            E.MaxCapacity,
-            'Login successful' AS Message,
-            CAST(1 AS BIT) AS Success
-        FROM Users U
-        INNER JOIN Establishments E ON U.EstablishmentId = E.Id
-        WHERE U.Id = @UserId;
-    END
-    ELSE
-    BEGIN
-        SELECT 
-            NULL AS Id,
-            NULL AS Email,
-            NULL AS FullName,
-            NULL AS EstablishmentId,
-            NULL AS Role,
-            CAST(0 AS BIT) AS IsActive,
-            NULL AS IdentityDocument,
-            NULL AS PhoneNumber,
-            CAST(0 AS BIT) AS MustChangePassword,
-            NULL AS CreatedDate,
-            NULL AS LastLoginDate,
-            NULL AS EstablishmentName,
-            NULL AS MaxCapacity,
-            'Invalid credentials' AS Message,
-            CAST(0 AS BIT) AS Success;
-    END
-END
-GO
-
--- SP for Register Entry
+-- 2. SP for Register Entry
 CREATE PROCEDURE sp_RegisterEntry
     @IdentityDocument NVARCHAR(20),
     @EstablishmentId INT,
@@ -274,7 +165,7 @@ BEGIN
 END
 GO
 
--- SP for Register Exit
+-- 3. SP for Register Exit
 CREATE PROCEDURE sp_RegisterExit
     @IdentityDocument NVARCHAR(20),
     @EstablishmentId INT,
@@ -336,26 +227,39 @@ BEGIN
 END
 GO
 
--- SP for Get Current Capacity
+-- 4. SP for Get Current Capacity
 CREATE PROCEDURE sp_GetCurrentCapacity
-    @EstablishmentId INT
+    @EstablishmentId INT,
+    @Success BIT OUTPUT,
+    @Message NVARCHAR(200) OUTPUT
 AS
 BEGIN
     SET NOCOUNT ON;
     
+    -- Validate establishment exists
+    IF NOT EXISTS (SELECT 1 FROM Establishments WHERE Id = @EstablishmentId)
+    BEGIN
+        SET @Success = 0;
+        SET @Message = 'Establishment not found';
+        RETURN;
+    END
+    
+    SET @Success = 1;
+    SET @Message = 'Capacity retrieved successfully';
+    
+    -- Return capacity data
     SELECT 
-        COUNT(*) AS CurrentCapacity,
+        ISNULL(COUNT(*), 0) AS CurrentCapacity,
         E.MaxCapacity,
         E.Name AS EstablishmentName
-    FROM AccessRecords AR
-    INNER JOIN Establishments E ON AR.EstablishmentId = E.Id
-    WHERE AR.EstablishmentId = @EstablishmentId 
-        AND AR.ExitDateTime IS NULL
+    FROM Establishments E
+    LEFT JOIN AccessRecords AR ON AR.EstablishmentId = E.Id AND AR.ExitDateTime IS NULL
+    WHERE E.Id = @EstablishmentId
     GROUP BY E.MaxCapacity, E.Name;
 END
 GO
 
--- SP for Open Establishment
+-- 5. SP for Open Establishment
 CREATE PROCEDURE sp_OpenEstablishment
     @EstablishmentId INT,
     @UserId INT,
@@ -398,7 +302,7 @@ BEGIN
 END
 GO
 
--- SP for Close Establishment
+-- 6. SP for Close Establishment
 CREATE PROCEDURE sp_CloseEstablishment
     @EstablishmentId INT,
     @UserId INT,
@@ -447,7 +351,7 @@ BEGIN
 END
 GO
 
--- SP for Create User
+-- 7. SP for Create User
 CREATE PROCEDURE sp_CreateUser
     @Email NVARCHAR(100),
     @Password NVARCHAR(255),
@@ -509,21 +413,43 @@ BEGIN
 END
 GO
 
--- SP for Get User Access History
+-- 8. SP for Get User Access History
 CREATE PROCEDURE sp_GetUserAccessHistory
     @EstablishmentId INT,
     @StartDate DATE,
-    @EndDate DATE
+    @EndDate DATE,
+    @Success BIT OUTPUT,
+    @Message NVARCHAR(200) OUTPUT
 AS
 BEGIN
     SET NOCOUNT ON;
     
+    -- Validate establishment exists
+    IF NOT EXISTS (SELECT 1 FROM Establishments WHERE Id = @EstablishmentId)
+    BEGIN
+        SET @Success = 0;
+        SET @Message = 'Establishment not found';
+        RETURN;
+    END
+    
+    -- Validate date range
+    IF @StartDate > @EndDate
+    BEGIN
+        SET @Success = 0;
+        SET @Message = 'Start date cannot be greater than end date';
+        RETURN;
+    END
+    
+    SET @Success = 1;
+    SET @Message = 'Access history retrieved successfully';
+    
+    -- Return access history
     SELECT 
         U.FullName,
         U.IdentityDocument,
         AR.EntryDateTime,
         AR.ExitDateTime,
-        DATEDIFF(MINUTE, AR.EntryDateTime, AR.ExitDateTime) AS DurationMinutes
+        DATEDIFF(MINUTE, AR.EntryDateTime, ISNULL(AR.ExitDateTime, GETDATE())) AS DurationMinutes
     FROM AccessRecords AR
     INNER JOIN Users U ON AR.UserId = U.Id
     WHERE AR.EstablishmentId = @EstablishmentId
@@ -532,20 +458,42 @@ BEGIN
 END
 GO
 
--- SP for Get Hourly Averages
+-- 9. SP for Get Hourly Averages
 CREATE PROCEDURE sp_GetHourlyAverages
     @EstablishmentId INT,
     @StartDate DATE,
-    @EndDate DATE
+    @EndDate DATE,
+    @Success BIT OUTPUT,
+    @Message NVARCHAR(200) OUTPUT
 AS
 BEGIN
     SET NOCOUNT ON;
     
+    -- Validate establishment exists
+    IF NOT EXISTS (SELECT 1 FROM Establishments WHERE Id = @EstablishmentId)
+    BEGIN
+        SET @Success = 0;
+        SET @Message = 'Establishment not found';
+        RETURN;
+    END
+    
+    -- Validate date range
+    IF @StartDate > @EndDate
+    BEGIN
+        SET @Success = 0;
+        SET @Message = 'Start date cannot be greater than end date';
+        RETURN;
+    END
+    
+    SET @Success = 1;
+    SET @Message = 'Hourly averages retrieved successfully';
+    
+    -- Return hourly data
     WITH HourlyData AS (
         SELECT 
             DATEPART(HOUR, EntryDateTime) AS Hour,
             COUNT(*) AS Entries,
-            CAST(COUNT(*) AS FLOAT) / COUNT(DISTINCT CAST(EntryDateTime AS DATE)) AS AvgEntries
+            CAST(COUNT(*) AS FLOAT) / NULLIF(COUNT(DISTINCT CAST(EntryDateTime AS DATE)), 0) AS AvgEntries
         FROM AccessRecords
         WHERE EstablishmentId = @EstablishmentId
             AND CAST(EntryDateTime AS DATE) BETWEEN @StartDate AND @EndDate
@@ -554,7 +502,8 @@ BEGIN
     SELECT 
         Hour,
         Entries,
-        ROUND(AvgEntries, 2) AS AverageEntriesPerDay
+        ROUND(ISNULL(AvgEntries, 0), 2) AS AverageEntriesPerDay
     FROM HourlyData
     ORDER BY Hour;
 END
+GO
