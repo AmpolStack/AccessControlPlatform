@@ -11,28 +11,28 @@ namespace AccessControl.Infraestructure.Common
 {
     public class TransactionParameterHelpers : ITransactionParameterHelpers
     {
-        public SqlParameter OutBit(string name)
+        public SqlParameter CreateInput(string name, object? value)
         {
-            return new SqlParameter(name, SqlDbType.Bit)
+            return new SqlParameter(name, value ?? DBNull.Value);
+        }
+
+        public SqlParameter CreateNullable(string name, object? value)
+        {
+            return new SqlParameter(name, value ?? DBNull.Value);
+        }
+
+        public SqlParameter CreateOutput(string name, SqlDbType type, int? size = null)
+        {
+            var p = new SqlParameter(name, type)
             {
                 Direction = ParameterDirection.Output
             };
-        }
 
-        public SqlParameter OutString(string name, int size)
-        {
-            return new SqlParameter(name, SqlDbType.NVarChar, size)
-            {
-                Direction = ParameterDirection.Output
-            };
-        }
+            if (size.HasValue)
+                p.Size = size.Value;
 
-        public (bool Success, string Message) ReadOutput(SqlParameter result, SqlParameter message)
-        {
-            return (
-                Convert.ToBoolean(result.Value),
-                Convert.ToString(message.Value) ?? string.Empty
-            );
+            return p;
         }
+    
     }
 }

@@ -97,7 +97,7 @@
                       Grid.RowSpan="2"
                       ModalWindowType="Danger"
                       ModalWindowText="El usuario no fué encontrado, intentalo de nuevo"
-                      ModalWindowVisibility="True"/>
+                      ModalWindowVisibility="False"/>
 
         </Grid>
 

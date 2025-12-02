@@ -10,10 +10,8 @@ namespace AccessControl.Core.Interfaces.Common
 {
     public interface ITransactionParameterHelpers
     {
-        SqlParameter OutBit(string name);
-
-        SqlParameter OutString(string name, int size);
-
-        (bool Success, string Message) ReadOutput(SqlParameter result, SqlParameter message);
+        SqlParameter CreateInput(string name, object? value);
+        SqlParameter CreateOutput(string name, SqlDbType type, int? size = null);
+        SqlParameter CreateNullable(string name, object? value);
     }
 }
