@@ -1,10 +1,8 @@
-﻿using AccessControl.Core.Interfaces.Repositories;
+﻿using AccessControl.Core.Interfaces.Services;
 using AccessControl.Core.Models;
-using AccessControl.Infraestructure.Repositories;
+using AccessControl.Infraestructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System.Configuration;
-using System.Data;
 using System.Windows;
 
 namespace AccessControl
@@ -18,7 +16,8 @@ namespace AccessControl
             var services = new ServiceCollection();
 
             services.AddSingleton<MainWindow>();
-            services.AddSingleton(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+            services.AddScoped<IUserService, UserService>();
 
             services.AddDbContext<AccessControlContext>(opt =>
             {
