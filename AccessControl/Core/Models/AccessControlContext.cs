@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AccessControl.Infraestructure.Dto;
+using Microsoft.EntityFrameworkCore;
 
 namespace AccessControl.Core.Models;
 
@@ -13,6 +14,9 @@ public partial class AccessControlContext : DbContext
     {
     }
 
+    public DbSet<LoginResultDto> LoginResultDto { get; set; }
+
+    public DbSet<CreateUserResultDto> createUserResultDto { get; set; }
     public virtual DbSet<AccessRecord> AccessRecords { get; set; }
 
     public virtual DbSet<Establishment> Establishments { get; set; }
@@ -25,6 +29,10 @@ public partial class AccessControlContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
+        modelBuilder.Entity<LoginResultDto>().HasNoKey();
+        modelBuilder.Entity<CreateUserResultDto>().HasNoKey();
+
         modelBuilder.Entity<AccessRecord>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__AccessRe__3214EC077D21DE8E");
