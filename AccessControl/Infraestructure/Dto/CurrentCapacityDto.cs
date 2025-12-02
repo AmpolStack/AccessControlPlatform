@@ -1,8 +1,5 @@
 namespace AccessControl.Infraestructure.Dto
 {
-    /// <summary>
-    /// DTO for Current Capacity data returned by sp_GetCurrentCapacity
-    /// </summary>
     public class CurrentCapacityDto
     {
         public int CurrentCapacity { get; set; }

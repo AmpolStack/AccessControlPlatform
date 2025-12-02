@@ -11,7 +11,7 @@ namespace AccessControl.Infraestructure.Dto
         public string IdentityDocument { get; set; } = string.Empty;
         public string? PhoneNumber { get; set; }
         public bool MustChangePassword { get; set; }
-        public DateTime CreatedDate { get; set; }
+        public DateTime? CreatedDate { get; set; }
         public DateTime? LastLoginDate { get; set; }
         public string EstablishmentName { get; set; } = string.Empty;
         public int? MaxCapacity { get; set; }

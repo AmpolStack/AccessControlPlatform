@@ -29,7 +29,7 @@ namespace AccessControl.Views.Controls
               nameof(Text),
               typeof(string), 
               typeof(FormFieldControl),
-              new PropertyMetadata(string.Empty));
+              new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
         public FormFieldControl()
         {
