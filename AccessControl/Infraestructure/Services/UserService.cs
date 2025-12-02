@@ -1,178 +1,201 @@
 ﻿using AccessControl.Core.Interfaces.Services;
 using AccessControl.Core.Models;
+using AccessControl.Infraestructure.Dto;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AccessControl.Infraestructure.Services
 {
-    public class UserService : IUserService
+    public class UserService(AccessControlContext context) : IUserService
     {
-        private readonly AccessControlContext _context;
+        private readonly AccessControlContext _context = context;
 
-        public UserService(AccessControlContext context)
+        // Logic embedded in sp
+        public async Task<(bool Success, string Message, User? User)> LoginAsync(string email, string password)
         {
-            _context = context;
-        }
+            await using var transaction = await _context.Database.BeginTransactionAsync();
 
-        public async Task<(bool Success, string Message, User? User)> LoginAsync(
-        string email,
-        string password)
-        {
             try
             {
-                var emailParam = new SqlParameter("@Email", email);
-                var passParam = new SqlParameter("@Password", password);
+                var pEmail = new SqlParameter("@Email", email);
+                var pPassword = new SqlParameter("@Password", password);
 
-                var userList = await _context.Users
-                    .FromSqlRaw("EXEC sp_LoginUser @Email, @Password", emailParam, passParam)
+                var result = await _context.LoginResultDto
+                    .FromSqlRaw("EXEC sp_UserLogin @Email, @Password", pEmail, pPassword)
                     .ToListAsync();
 
-                if (userList.Count == 0)
-                    return (false, "Credenciales incorrectas", null);
+                var dto = result.FirstOrDefault();
+                if (dto == null)
+                {
+                    await transaction.RollbackAsync();
+                    return (false, "Invalid response", null);
+                }
 
-                return (true, "Login exitoso", userList.First());
-            }
-            catch (SqlException ex)
-            {
-                return (false, $"Error SQL: {ex.Message}", null);
+                if (!dto.Success)
+                {
+                    await transaction.RollbackAsync();
+                    return (false, dto.Message!, null);
+                }
+
+                // TODO: Map DTO to User entity with Automapper
+                var user = new User
+                {
+                    Id = dto.Id,
+                    Email = dto.Email!,
+                    FullName = dto!.FullName!,
+                    IdentityDocument = dto.IdentityDocument!,
+                    PhoneNumber = dto.PhoneNumber,
+                    Role = dto.Role!,
+                    EstablishmentId = dto.EstablishmentId,
+                    IsActive = dto.IsActive,
+                    MustChangePassword = dto.MustChangePassword
+                };
+
+                await transaction.CommitAsync();
+                return (true, dto.Message!, user);
             }
             catch (Exception ex)
             {
-                return (false, $"Error inesperado: {ex.Message}", null);
+                await transaction.RollbackAsync();
+                return (false, ex.Message, null);
             }
         }
 
-        // ============================================================
-        // REGISTRAR USUARIO (via Stored Procedure)
-        // ============================================================
-        public async Task<(bool Success, string Message)> RegisterAsync(User user)
+        // Embedded logic in stored procedure
+        public async Task<(bool Success, string Message)> CreateUserAsync(User user)
         {
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
             try
             {
-                var p1 = new SqlParameter("@Name", user.FullName);
-                var p2 = new SqlParameter("@Email", user.Email);
-                var p3 = new SqlParameter("@PasswordHash", user.Password);
-                var p4 = new SqlParameter("@Role", user.Role);
-
-                var pMessage = new SqlParameter("@Message", SqlDbType.NVarChar, 150)
+                var pResult = new SqlParameter("@Result", SqlDbType.Bit)
                 {
                     Direction = ParameterDirection.Output
                 };
-                var pSuccess = new SqlParameter("@Success", SqlDbType.Bit)
+
+                var pMessage = new SqlParameter("@Message", SqlDbType.NVarChar, 200)
                 {
                     Direction = ParameterDirection.Output
                 };
 
                 await _context.Database.ExecuteSqlRawAsync(
-                    "EXEC sp_RegisterUser @Name, @Email, @PasswordHash, @Role, @Message OUTPUT, @Success OUTPUT",
-                    p1, p2, p3, p4, pMessage, pSuccess
+                    @"EXEC sp_CreateUser 
+                    @Email,
+                    @Password,
+                    @FullName,
+                    @IdentityDocument,
+                    @PhoneNumber,
+                    @EstablishmentId,
+                    @Role,
+                    @CreatedBy,
+                    @Result OUTPUT,
+                    @Message OUTPUT",
+                    new SqlParameter("@Email", user.Email),
+                    new SqlParameter("@Password", user.Password),
+                    new SqlParameter("@FullName", user.FullName),
+                    new SqlParameter("@IdentityDocument", user.IdentityDocument),
+                    new SqlParameter("@PhoneNumber", (object?)user.PhoneNumber ?? DBNull.Value),
+                    new SqlParameter("@EstablishmentId", user.EstablishmentId),
+                    new SqlParameter("@Role", user.Role),
+                    new SqlParameter("@CreatedBy", 0),
+                    pResult,
+                    pMessage
                 );
 
-                return ((bool)pSuccess.Value, (string)pMessage.Value);
-            }
-            catch (SqlException ex)
-            {
-                return (false, $"Error SQL: {ex.Message}");
+                var result = new CreateUserResultDto()
+                {
+                    Success = (bool)pResult.Value,
+                    Message = (string)pMessage.Value
+                };
+
+                if (!result.Success)
+                {
+                    await transaction.RollbackAsync();
+                    return (false, result.Message);
+                }
+
+                await transaction.CommitAsync();
+                return (true, result.Message);
             }
             catch (Exception ex)
             {
-                return (false, $"Error inesperado: {ex.Message}");
+                await transaction.RollbackAsync();
+                return (false, ex.Message);
             }
         }
 
-        // ============================================================
-        // ACTUALIZAR USUARIO (SP o EF, depende de lo que tengas)
-        // ============================================================
-        public async Task<(bool Success, string Message)> UpdateAsync(User user)
+        // Implements logic directly, no stored procedure
+        public async Task<(bool Success, string Message)> UpdateUserAsync(User user)
         {
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
             try
             {
-                // SUPONIENDO que tienes el SP sp_UpdateUser
-                var p1 = new SqlParameter("@Id", user.Id);
-                var p2 = new SqlParameter("@Name", user.Name);
-                var p3 = new SqlParameter("@Email", user.Email);
-                var p4 = new SqlParameter("@Role", user.Role);
+                var entity = await _context.Users.FindAsync(user.Id);
 
-                var pMessage = new SqlParameter("@Message", SqlDbType.NVarChar, 150)
+                if (entity == null)
                 {
-                    Direction = ParameterDirection.Output
-                };
-                var pSuccess = new SqlParameter("@Success", SqlDbType.Bit)
-                {
-                    Direction = ParameterDirection.Output
-                };
+                    await transaction.RollbackAsync();
+                    return (false, "User not found");
+                }
 
-                await _context.Database.ExecuteSqlRawAsync(
-                    "EXEC sp_UpdateUser @Id, @Name, @Email, @Role, @Message OUTPUT, @Success OUTPUT",
-                    p1, p2, p3, p4, pMessage, pSuccess
-                );
+                entity.Email = user.Email;
+                entity.FullName = user.FullName;
+                entity.PhoneNumber = user.PhoneNumber;
+                entity.Role = user.Role;
+                entity.IdentityDocument = user.IdentityDocument;
+                entity.IsActive = user.IsActive;
+                entity.EstablishmentId = user.EstablishmentId;
 
-                return ((bool)pSuccess.Value, (string)pMessage.Value);
-            }
-            catch (SqlException ex)
-            {
-                return (false, $"Error SQL: {ex.Message}");
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return (true, "User updated successfully");
             }
             catch (Exception ex)
             {
-                return (false, $"Error inesperado: {ex.Message}");
+                await transaction.RollbackAsync();
+                return (false, ex.Message);
             }
         }
 
-        // ============================================================
-        // ELIMINAR USUARIO (via SP)
-        // ============================================================
-        public async Task<(bool Success, string Message)> DeleteAsync(int userId)
+
+        // Implements logic directly, no stored procedure
+        public async Task<(bool Success, string Message)> DeleteUserAsync(int id)
         {
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
             try
             {
-                var pId = new SqlParameter("@Id", userId);
+                var user = await _context.Users.FindAsync(id);
 
-                var pMessage = new SqlParameter("@Message", SqlDbType.NVarChar, 150)
+                if (user == null)
                 {
-                    Direction = ParameterDirection.Output
-                };
-                var pSuccess = new SqlParameter("@Success", SqlDbType.Bit)
-                {
-                    Direction = ParameterDirection.Output
-                };
+                    await transaction.RollbackAsync();
+                    return (false, "User not found");
+                }
 
-                await _context.Database.ExecuteSqlRawAsync(
-                    "EXEC sp_DeleteUser @Id, @Message OUTPUT, @Success OUTPUT",
-                    pId, pMessage, pSuccess
-                );
+                _context.Users.Remove(user);
+                await _context.SaveChangesAsync();
 
-                return ((bool)pSuccess.Value, (string)pMessage.Value);
-            }
-            catch (SqlException ex)
-            {
-                return (false, $"Error SQL: {ex.Message}");
+                await transaction.CommitAsync();
+                return (true, "User deleted");
             }
             catch (Exception ex)
             {
-                return (false, $"Error inesperado: {ex.Message}");
+                await transaction.RollbackAsync();
+                return (false, ex.Message);
             }
         }
 
-        // ============================================================
-        // OBTENER TODOS LOS USUARIOS (NO SP, EF es suficiente)
-        // ============================================================
-        public async Task<List<User>> GetAllAsync()
+        // Implements logic directly, no stored procedure, and not use transaction
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
-            try
-            {
-                return await _context.Users.AsNoTracking().ToListAsync();
-            }
-            catch
-            {
-                return new List<User>();
-            }
+            return await _context.Users
+                .AsNoTracking()
+                .ToListAsync();
         }
+
     }
 }

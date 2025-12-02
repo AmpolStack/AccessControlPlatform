@@ -5,14 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AccessControl.Infraestructure.Services
+namespace AccessControl.Core.Interfaces.Services
 {
     public interface IUserService
     {
         Task<(bool Success, string Message, User? User)> LoginAsync(string email, string password);
-        Task<(bool Success, string Message)> RegisterAsync(User user);
-        Task<(bool Success, string Message)> UpdateAsync(User user);
-        Task<(bool Success, string Message)> DeleteAsync(int userId);
-        Task<List<User>> GetAllAsync();
+        Task<(bool Success, string Message)> CreateUserAsync(User user);
+        Task<(bool Success, string Message)> UpdateUserAsync(User user);
+        Task<(bool Success, string Message)> DeleteUserAsync(int userId);
+        Task<IEnumerable<User>> GetAllUsersAsync();
     }
 }
