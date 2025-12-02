@@ -41,5 +41,14 @@ namespace AccessControl.Views.Controls
             get => (ICommand?)GetValue(CommandProperty);
             set => SetValue(CommandProperty, value);
         }
+
+        public static readonly DependencyProperty CommandParameterProperty =
+            DependencyProperty.Register("CommandParameter", typeof(object), typeof(StandardButtonControl), new PropertyMetadata(null));
+
+        public object CommandParameter
+        {
+            get { return GetValue(CommandParameterProperty); }
+            set { SetValue(CommandParameterProperty, value); }
+        }
     }
 }
