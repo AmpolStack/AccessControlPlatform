@@ -1,0 +1,110 @@
+<Page x:Class="AccessControl.Views.Pages.UsersPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:AccessControl.Views.Pages"
+      xmlns:behavior="clr-namespace:AccessControl.Infraestructure.Common"
+      mc:Ignorable="d" 
+      d:DesignHeight="600" d:DesignWidth="800"
+      Title="UsersPage"
+      Background="Transparent"
+      behavior:ViewLoadedBehavior.OnLoaded="{Binding RefreshCommand}">
+
+    <Grid Margin="40,20,40,40">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Header + Button -->
+            <RowDefinition Height="*"/>    <!-- Table -->
+        </Grid.RowDefinitions>
+
+        <!-- Header Section -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0"
+                       Text="USUARIOS"
+                       Style="{StaticResource AppTitleStyle}"
+                       FontSize="{StaticResource FontSizeLarge}"
+                       VerticalAlignment="Center"/>
+
+            <Button Grid.Column="1"
+                    Content="CREAR NUEVO"
+                    Command="{Binding CreateUserCommand}"
+                    Style="{StaticResource AppDangerButtonStyle}"
+                    Padding="20,10"/>
+        </Grid>
+
+        <!-- Users Table -->
+        <Border Grid.Row="1"
+                Background="{StaticResource AppWhiteBrush}"
+                BorderBrush="{StaticResource AppBackgroundReadOnlyBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+            
+            <DataGrid ItemsSource="{Binding Users}"
+                      Style="{StaticResource AppDataGridStyle}">
+
+                <!-- Columns -->
+                <DataGrid.Columns>
+                    
+                    <!-- Nombre Completo -->
+                    <DataGridTextColumn Header="Nombre Completo" 
+                                        Binding="{Binding FullName}" 
+                                        Width="2*"/>
+
+                    <!-- Fecha Acceso -->
+                    <DataGridTextColumn Header="Fecha Acceso" 
+                                        Binding="{Binding LastAccessDateFormatted}" 
+                                        Width="1.2*"/>
+
+                    <!-- Documento -->
+                    <DataGridTextColumn Header="Documento" 
+                                        Binding="{Binding IdentityDocument}" 
+                                        Width="1.2*"/>
+
+                    <!-- Correo -->
+                    <DataGridTextColumn Header="Correo" 
+                                        Binding="{Binding Email}" 
+                                        Width="1.8*"/>
+
+                    <!-- Acciones -->
+                    <DataGridTemplateColumn Header="Acciones" Width="2.5*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    
+                                    <!-- Botón Ir a Registros -->
+                                    <Button Content="Registros"
+                                            Command="{Binding ViewRecordsCommand}"
+                                            Style="{StaticResource AppSecondaryButtonStyle}"
+                                            Padding="10,6"
+                                            FontSize="{StaticResource FontSizeSmall}"
+                                            Margin="0,0,8,0"/>
+
+                                    <!-- Botón Editar -->
+                                    <Button Content="Editar"
+                                            Command="{Binding EditCommand}"
+                                            Style="{StaticResource AppPrimaryButtonStyle}"
+                                            Padding="10,6"
+                                            FontSize="{StaticResource FontSizeSmall}"
+                                            Margin="0,0,8,0"/>
+                                    
+                                    <!-- Botón Eliminar -->
+                                    <Button Content="Eliminar"
+                                            Command="{Binding DeleteCommand}"
+                                            Style="{StaticResource AppDangerButtonStyle}"
+                                            Padding="10,6"
+                                            FontSize="{StaticResource FontSizeSmall}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+    </Grid>
+</Page>

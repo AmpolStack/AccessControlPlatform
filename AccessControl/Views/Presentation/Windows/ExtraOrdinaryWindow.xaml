@@ -1,0 +1,79 @@
+﻿<Window x:Class="AccessControl.Views.Windows.ExtraOrdinaryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AccessControl.Views.Windows"
+        xmlns:controls="clr-namespace:AccessControl.Views.Controls"
+        mc:Ignorable="d"
+        WindowStyle="None"
+        Background="Transparent"
+        AllowsTransparency="True"
+        WindowStartupLocation="CenterScreen"
+        Title="ExtraOrdinaryWindow" Height="680" Width="905">
+    <Border Background="{StaticResource AppWhiteBrush}" CornerRadius="18" Padding="30,30,30, 20">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MaxWidth="200"/>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="*" MaxWidth="200"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" MaxHeight="100"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*" MaxHeight="40"/>
+            </Grid.RowDefinitions>
+
+            <controls:HeaderControl Grid.ColumnSpan="3"/>
+
+            <StackPanel Grid.Row="1"
+                        VerticalAlignment="Top"
+                        Grid.Column="1">
+
+                <!-- Título dinámico con color según ElementType -->
+                <TextBlock TextWrapping="Wrap" 
+                           Foreground="{Binding ElementType, Converter={StaticResource AppElementTypeToBrushConverter}}"
+                           FontWeight="{StaticResource InterBoldWeight}"
+                           Text="{Binding WindowTitle}"
+                           FontSize="35"
+                           Margin="0"
+                           HorizontalAlignment="Center"/>
+
+                <!-- ContentPresenter para contenido personalizado (XAML dinámico) -->
+                <!-- Si CustomContent está definido, se muestra; si no, se muestra MessageBody -->
+                <ContentPresenter Content="{Binding CustomContent}"
+                                  Margin="40,20"
+                                  HorizontalAlignment="Center">
+                    <ContentPresenter.Style>
+                        <Style TargetType="ContentPresenter">
+                            <Style.Triggers>
+                                <!-- Si CustomContent es null, mostramos MessageBody en su lugar -->
+                                <DataTrigger Binding="{Binding CustomContent}" Value="{x:Null}">
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <TextBlock TextWrapping="Wrap"
+                                                       TextAlignment="Left"
+                                                       Foreground="{StaticResource AppBlackBrush}"
+                                                       FontWeight="{StaticResource InterNormalWeight}"
+                                                       FontSize="18"
+                                                       Text="{Binding MessageBody}"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentPresenter.Style>
+                </ContentPresenter>
+
+                <!-- Botón dinámico con binding a ButtonContent y ButtonCommand -->
+                <controls:StandardButtonControl
+                                     ButtonContent="{Binding ButtonContent}"
+                                     ButtonType="Vibrant"
+                                     Command="{Binding ButtonCommand}"
+                                     />
+
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

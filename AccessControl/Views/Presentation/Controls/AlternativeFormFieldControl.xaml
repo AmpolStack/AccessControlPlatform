@@ -1,0 +1,101 @@
+﻿<UserControl x:Class="AccessControl.Views.Controls.AlternativeFormFieldControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AccessControl.Views.Controls"
+             x:Name="ucAlternativeFormField"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+
+        <Style x:Key="FormFieldBorderStyle" TargetType="Border">
+            <Setter Property="CornerRadius" Value="2"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="{StaticResource AppWhiteBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AppWhiteBrush}"/>
+            <Setter Property="Effect">
+
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="5" ShadowDepth="3" Opacity="0" Color="#444" Direction="270"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsFocused, ElementName=txtInput}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                
+                                <!-- Background color change animation -->
+                                <ColorAnimation To="{StaticResource AppWhiteColor}"
+                                             Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                             Duration="0:0:0.2"/>
+                                
+                                <!-- Border color change animation -->
+                                <ColorAnimation To="{StaticResource AppGrayColor}"
+                                             Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                             Duration="0:0:0.2"/>
+                                
+                                <!-- Shadow animation -->
+                                <DoubleAnimation To="0.3"
+                                              Storyboard.TargetProperty="(Border.Effect).(DropShadowEffect.Opacity)"
+                                              Duration="0:0:0.2">
+                                    <DoubleAnimation.EasingFunction>
+                                        <CubicEase EasingMode="EaseOut"/>
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                
+                                <!-- Revert to original colors -->
+                                <ColorAnimation To="{StaticResource AppWhiteColor}"
+                                             Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                             Duration="0:0:0.2"/>
+                                <ColorAnimation To="{StaticResource AppWhiteColor}"
+                                             Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                             Duration="0:0:0.2"/>
+                                
+                                <!-- Fade shadow -->
+                                <DoubleAnimation To="0"
+                                              Storyboard.TargetProperty="(Border.Effect).(DropShadowEffect.Opacity)"
+                                              Duration="0:0:0.2">
+                                    <DoubleAnimation.EasingFunction>
+                                        <CubicEase EasingMode="EaseOut"/>
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <StackPanel Orientation="Vertical"
+             Margin="2,10"
+             HorizontalAlignment="Stretch">
+
+        <Label Content="{Binding LabelText, ElementName=ucAlternativeFormField}"
+             Padding="0"
+             FontWeight="{StaticResource InterSemiBoldWeight}"
+             Foreground="#373737"
+             Target="{Binding ElementName=txtInput}" />
+
+        <Border x:Name="borderContainer"
+             CornerRadius="8"
+             Style="{StaticResource FormFieldBorderStyle}">
+            <TextBox x:Name="txtInput"
+                  BorderThickness="0"
+                  Padding="0,8"
+                  Background="Transparent"
+                  VerticalContentAlignment="Center"
+                  TextWrapping="{Binding TextWrapMode, ElementName=ucAlternativeFormField}"
+                  Text="{Binding Text, ElementName=ucAlternativeFormField, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        </Border>
+
+    </StackPanel>
+</UserControl>

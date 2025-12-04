@@ -15,9 +15,11 @@
             <converter:ButtonTypeToColorConverter x:Key="AppElementypeToColorConverter"/>
             <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
 
+            
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Resources/Styles/FontsResource.xaml"/>
+                <ResourceDictionary Source="/Resources/Styles/FontsResource.xaml"/>
                 <ResourceDictionary Source="/Resources/Styles/ColorResource.xaml"/>
+                <ResourceDictionary Source="/Resources/Styles/ControlsResource.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             
         </ResourceDictionary>

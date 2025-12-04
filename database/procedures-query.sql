@@ -1,3 +1,5 @@
+
+-- User Login Sp
 CREATE PROCEDURE sp_UserLogin
     @Email NVARCHAR(100),
     @Password NVARCHAR(100),
@@ -31,6 +33,13 @@ BEGIN
     BEGIN
         SET @Success = 0;
         SET @Message = 'User inactive';
+        GOTO FinalSelect;
+    END
+
+    IF EXISTS (SELECT 1 FROM AccessRecords WHERE UserId = @UserId AND ExitDateTime IS NULL)
+    BEGIN
+        SET @Success = 0;
+        SET @Message = 'hay una sesión abierta en este perfil';
         GOTO FinalSelect;
     END
     
@@ -71,7 +80,7 @@ GO
 
 -- 2. SP for Register Entry
 CREATE PROCEDURE sp_RegisterEntry
-    @IdentityDocument NVARCHAR(20),
+    @UserId INT,
     @EstablishmentId INT,
     @Result BIT OUTPUT,
     @Message NVARCHAR(200) OUTPUT
@@ -81,18 +90,17 @@ BEGIN
     BEGIN TRANSACTION;
     
     BEGIN TRY
-        DECLARE @UserId INT;
         DECLARE @CurrentCapacity INT;
         DECLARE @MaxCapacity INT;
         DECLARE @EstablishmentOpen BIT;
-        
-        -- Check if establishment is open
+
+
         SELECT @EstablishmentOpen = COUNT(*)
         FROM EstablishmentOpenings 
         WHERE EstablishmentId = @EstablishmentId 
-            AND Status = 'Open'
-            AND CAST(OpeningDateTime AS DATE) = CAST(GETDATE() AS DATE);
-        
+          AND Status = 'Open'
+          AND CAST(OpeningDateTime AS DATE) = CAST(GETDATE() AS DATE);
+
         IF @EstablishmentOpen = 0
         BEGIN
             SET @Result = 0;
@@ -101,18 +109,17 @@ BEGIN
             RETURN;
         END
         
-        -- Get current capacity
+
         SELECT @CurrentCapacity = COUNT(*)
         FROM AccessRecords 
         WHERE EstablishmentId = @EstablishmentId 
-            AND ExitDateTime IS NULL;
+          AND ExitDateTime IS NULL;
         
-        -- Get max capacity (NULL means no limit)
+
         SELECT @MaxCapacity = MaxCapacity 
         FROM Establishments 
         WHERE Id = @EstablishmentId;
-        
-        -- Check capacity only if MaxCapacity is not NULL
+
         IF @MaxCapacity IS NOT NULL AND @CurrentCapacity >= @MaxCapacity
         BEGIN
             SET @Result = 0;
@@ -121,25 +128,24 @@ BEGIN
             RETURN;
         END
         
-        -- Find user by identity document
-        SELECT @UserId = Id 
-        FROM Users 
-        WHERE IdentityDocument = @IdentityDocument AND IsActive = 1;
-        
-        IF @UserId IS NULL
+
+        IF NOT EXISTS (
+            SELECT 1 FROM Users 
+            WHERE Id = @UserId AND IsActive = 1
+        )
         BEGIN
             SET @Result = 0;
-            SET @Message = 'User not found with this identity document';
+            SET @Message = 'User not found or inactive';
             ROLLBACK;
             RETURN;
         END
         
-        -- Check if user is already inside
+
         IF EXISTS (
-            SELECT 1 FROM AccessRecords 
-            WHERE UserId = @UserId 
-                AND EstablishmentId = @EstablishmentId 
-                AND ExitDateTime IS NULL
+            SELECT 1 FROM AccessRecords
+            WHERE UserId = @UserId
+              AND EstablishmentId = @EstablishmentId
+              AND ExitDateTime IS NULL
         )
         BEGIN
             SET @Result = 0;
@@ -148,7 +154,7 @@ BEGIN
             RETURN;
         END
         
-        -- Register entry
+
         INSERT INTO AccessRecords (UserId, EstablishmentId, EntryDateTime)
         VALUES (@UserId, @EstablishmentId, GETDATE());
         
@@ -167,7 +173,7 @@ GO
 
 -- 3. SP for Register Exit
 CREATE PROCEDURE sp_RegisterExit
-    @IdentityDocument NVARCHAR(20),
+    @UserId INT,
     @EstablishmentId INT,
     @Result BIT OUTPUT,
     @Message NVARCHAR(200) OUTPUT
@@ -177,30 +183,27 @@ BEGIN
     BEGIN TRANSACTION;
     
     BEGIN TRY
-        DECLARE @UserId INT;
         DECLARE @AccessRecordId BIGINT;
-        
-        -- Find user
-        SELECT @UserId = Id 
-        FROM Users 
-        WHERE IdentityDocument = @IdentityDocument AND IsActive = 1;
-        
-        IF @UserId IS NULL
+
+        IF NOT EXISTS (
+            SELECT 1 FROM Users 
+            WHERE Id = @UserId AND IsActive = 1
+        )
         BEGIN
             SET @Result = 0;
-            SET @Message = 'User not found';
+            SET @Message = 'User not found or inactive';
             ROLLBACK;
             RETURN;
         END
-        
-        -- Find entry record without exit
+
+
         SELECT TOP 1 @AccessRecordId = Id
-        FROM AccessRecords 
-        WHERE UserId = @UserId 
-            AND EstablishmentId = @EstablishmentId 
-            AND ExitDateTime IS NULL
+        FROM AccessRecords
+        WHERE UserId = @UserId
+          AND EstablishmentId = @EstablishmentId
+          AND ExitDateTime IS NULL
         ORDER BY EntryDateTime DESC;
-        
+
         IF @AccessRecordId IS NULL
         BEGIN
             SET @Result = 0;
@@ -208,15 +211,15 @@ BEGIN
             ROLLBACK;
             RETURN;
         END
-        
-        -- Register exit
-        UPDATE AccessRecords 
+
+        UPDATE AccessRecords
         SET ExitDateTime = GETDATE()
         WHERE Id = @AccessRecordId;
-        
+
+
         SET @Result = 1;
         SET @Message = 'Exit registered successfully';
-        
+
         COMMIT;
     END TRY
     BEGIN CATCH
@@ -226,6 +229,7 @@ BEGIN
     END CATCH
 END
 GO
+
 
 -- 4. SP for Get Current Capacity
 CREATE PROCEDURE sp_GetCurrentCapacity

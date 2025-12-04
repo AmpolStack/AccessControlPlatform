@@ -1,6 +1,4 @@
 ﻿using AccessControl.Views.Enums;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
@@ -10,7 +8,7 @@ namespace AccessControl.Views.Converter
 {
     public class ButtonTypeToBrushConverter : IValueConverter
     {
-        public ButtonTypeToBrushConverter() {}
+        public ButtonTypeToBrushConverter() { }
 
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -31,9 +29,9 @@ namespace AccessControl.Views.Converter
             return GetBrush("AppBlackBrush");
         }
 
-        private static object GetBrush(string key) 
+        private static object GetBrush(string key)
             => (Brush)Application.Current.FindResource(key);
-        
+
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {

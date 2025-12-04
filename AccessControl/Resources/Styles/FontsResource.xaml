@@ -1,13 +1,60 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
    
-    <FontFamily x:Key="InterFont">./Resources/Assets/Fonts/Inter/inter-font.ttf#Inter</FontFamily>
+    <FontFamily x:Key="InterFont">/Resources/Assets/Fonts/Inter/inter-font.ttf#Inter</FontFamily>
 
+    <!-- Font Weights -->
     <FontWeight x:Key="InterThinWeight">Thin</FontWeight>
     <FontWeight x:Key="InterLightWeight">Light</FontWeight>
     <FontWeight x:Key="InterNormalWeight">Normal</FontWeight>
     <FontWeight x:Key="InterMediumWeight">Medium</FontWeight>
     <FontWeight x:Key="InterSemiBoldWeight">SemiBold</FontWeight>
     <FontWeight x:Key="InterBoldWeight">Bold</FontWeight>
+
+    <!-- Font Sizes -->
+    <sys:Double x:Key="FontSizeSmall">12</sys:Double>
+    <sys:Double x:Key="FontSizeNormal">14</sys:Double>
+    <sys:Double x:Key="FontSizeMedium">16</sys:Double>
+    <sys:Double x:Key="FontSizeLarge">20</sys:Double>
+    <sys:Double x:Key="FontSizeExtraLarge">24</sys:Double>
+    <sys:Double x:Key="FontSizeTitle">32</sys:Double>
+
+    <!-- Text Styles -->
+    <Style x:Key="AppTitleStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource InterFont}"/>
+        <Setter Property="FontWeight" Value="{StaticResource InterBoldWeight}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeExtraLarge}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AppTextPrimaryBrush}"/>
+    </Style>
+
+    <Style x:Key="AppSubtitleStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource InterFont}"/>
+        <Setter Property="FontWeight" Value="{StaticResource InterSemiBoldWeight}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeLarge}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AppTextPrimaryBrush}"/>
+    </Style>
+
+    <Style x:Key="AppBodyStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource InterFont}"/>
+        <Setter Property="FontWeight" Value="{StaticResource InterNormalWeight}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeNormal}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AppTextSecondaryBrush}"/>
+    </Style>
+
+    <Style x:Key="AppLabelStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource InterFont}"/>
+        <Setter Property="FontWeight" Value="{StaticResource InterMediumWeight}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeNormal}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AppTextSecondaryBrush}"/>
+        <Setter Property="Margin" Value="0,0,0,8"/>
+    </Style>
+
+    <Style x:Key="AppSmallTextStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource InterFont}"/>
+        <Setter Property="FontWeight" Value="{StaticResource InterNormalWeight}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeSmall}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AppTextTertiaryBrush}"/>
+    </Style>
     
 </ResourceDictionary>

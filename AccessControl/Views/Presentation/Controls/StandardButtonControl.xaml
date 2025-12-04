@@ -1,0 +1,125 @@
+﻿<UserControl x:Class="AccessControl.Views.Controls.StandardButtonControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:converter="clr-namespace:AccessControl.Views.Converter"
+             mc:Ignorable="d" 
+             x:Name="ucStandardButton"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch"
+             d:DesignHeight="60" d:DesignWidth="200">
+
+    <UserControl.Resources>
+
+        <!-- When the mouse enters -->
+        <Storyboard x:Key="ShrinkStoryboard">
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                             To="0.97"
+                             Duration="0:0:0.10" />
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                             To="0.97"
+                             Duration="0:0:0.10" />
+        </Storyboard>
+
+        <!-- When the mouse leaves -->
+        <Storyboard x:Key="RestoreStoryboard">
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                             To="1"
+                             Duration="0:0:0.10" />
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                             To="1"
+                             Duration="0:0:0.10" />
+        </Storyboard>
+
+    </UserControl.Resources>
+
+
+    <Border CornerRadius="5"
+            Background="{Binding ButtonType, ElementName=ucStandardButton, Converter={StaticResource AppElementTypeToBrushConverter}}"
+            BorderBrush="{Binding ButtonType, ElementName=ucStandardButton, Converter={StaticResource AppElementTypeToBrushConverter}}"
+            HorizontalAlignment="Center"
+            MaxHeight="40"
+            Cursor="Hand">
+
+        <Border.RenderTransform>
+            <ScaleTransform ScaleX="1" ScaleY="1"/>
+        </Border.RenderTransform>
+
+        <Border.Style>
+            <Style TargetType="Border">
+                <Style.Triggers>
+
+                    <!-- Hover in border -->
+                    <EventTrigger RoutedEvent="MouseEnter">
+                        <BeginStoryboard Storyboard="{StaticResource ShrinkStoryboard}"/>
+                    </EventTrigger>
+
+                    <EventTrigger RoutedEvent="MouseLeave">
+                        <BeginStoryboard Storyboard="{StaticResource RestoreStoryboard}"/>
+                    </EventTrigger>
+
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+
+        <Button 
+        VerticalAlignment="Stretch"
+        HorizontalAlignment="Stretch" Content="{Binding ButtonContent, ElementName=ucStandardButton}"
+        FontSize="14"
+        Command="{Binding Command, ElementName=ucStandardButton}"
+        CommandParameter="{Binding CommandParameter, ElementName=ucStandardButton}"
+        Background="Transparent"
+        Foreground="{StaticResource AppWhiteBrush}"
+        FontWeight="{StaticResource InterSemiBoldWeight}"
+        Padding="30,8"
+        BorderThickness="0"
+        Cursor="Hand">
+
+            <Button.Style>
+                <Style TargetType="Button">
+
+                    <!-- Remove the default button styles -->
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="Button">
+                                <Border 
+                            Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}"
+                            BorderThickness="0">
+
+                                    <Border.RenderTransform>
+                                        <ScaleTransform ScaleX="1" ScaleY="1"/>
+                                    </Border.RenderTransform>
+
+                                    <ContentPresenter 
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+
+                    <Style.Triggers>
+
+                        <!-- Animation Hover -->
+                        <EventTrigger RoutedEvent="MouseEnter">
+                            <BeginStoryboard Storyboard="{StaticResource ShrinkStoryboard}"/>
+                        </EventTrigger>
+
+                        <EventTrigger RoutedEvent="MouseLeave">
+                            <BeginStoryboard Storyboard="{StaticResource RestoreStoryboard}"/>
+                        </EventTrigger>
+
+                    </Style.Triggers>
+
+                </Style>
+            </Button.Style>
+
+        </Button>
+
+
+
+    </Border>
+
+</UserControl>

@@ -1,6 +1,5 @@
 ﻿using AccessControl.Views.Enums;
 using System.Globalization;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 

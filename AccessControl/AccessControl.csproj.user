@@ -2,16 +2,40 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup />
   <ItemGroup>
-    <Compile Update="Views\Controls\HeaderControl.xaml.cs">
+    <Compile Update="Views\Presentation\Controls\AlternativeFormFieldControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Views\Controls\FormFieldControl.xaml.cs">
+    <Compile Update="Views\Presentation\Controls\HeaderControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Views\Controls\ModalWindowControl.xaml.cs">
+    <Compile Update="Views\Presentation\Controls\FormFieldControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Views\Controls\StandardButtonControl.xaml.cs">
+    <Compile Update="Views\Presentation\Controls\ImportantMessageControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Presentation\Controls\ModalWindowControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Presentation\Controls\StandardButtonControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Presentation\Controls\WildCardFormularyControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Presentation\Pages\ProfilePage.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Presentation\Windows\DashboardWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Presentation\Windows\EstablishmentCreatonWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Presentation\Windows\ExtraOrdinaryWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Presentation\Windows\SuccessfulEstablishmentCreation.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
